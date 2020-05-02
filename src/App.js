@@ -23,22 +23,69 @@ const initialExpensec = [
 ];
 
 function App() {
+  //*******STATE VALUES *************/
+  //***EXPENSES */
   const [expenses, setExpenses] = useState(initialExpensec);
-  console.log(expenses);
+  //*****Single Expense ****/
+  const [charge, setCharge] = useState("");
 
+  //*****Single Cost *******/
+  const [cost, setCost] = useState("");
+  //*****Alert ****/
+  const [alert, setAlert] = useState({ show: false });
+  //****************FUNCTIONALITIES */
+  const handleCharge = (e) => {
+    setCharge(e.target.value);
+  };
+  const handleCost = (e) => {
+    setCost(e.target.value);
+  };
+  //**HANDLING ALERT */
+  const handleAlert = ({ type, text }) => {
+    setAlert({
+      show: true,
+      type,
+      text,
+    });
+    setTimeout(() => {
+      setAlert({ show: false });
+    }, 3000);
+  };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (charge != "" && cost > 0) {
+      const singleExpense = { id: uuid(), charge, cost };
+      setExpenses([...expenses, singleExpense]);
+      handleAlert({ type: "success", text: "item added" });
+      setCharge("");
+      setCost("");
+    } else {
+      //handleAlert
+      handleAlert({
+        type: "danger",
+        text: "Charge can't be null and cost has to be greater than zero",
+      });
+    }
+  };
   return (
     <>
-      <Alert />
+      {alert.show && <Alert type={alert.type} text={alert.text} />}
       <h1>Budget Calculator</h1>
       <main className="App">
-        <ExpenseForm />
+        <ExpenseForm
+          charge={charge}
+          cost={cost}
+          handleCharge={handleCharge}
+          handleCost={handleCost}
+          handleSubmit={handleSubmit}
+        />
         <ExpenseList expenses={expenses} />
       </main>
       <h1>
         Total Spending:
         <span className="total">
           {expenses.reduce((acc, cur) => {
-            return (acc = acc + cur.cost);
+            return (acc = acc + parseInt(cur.cost));
           }, 0)}
         </span>
       </h1>
