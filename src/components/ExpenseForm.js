@@ -3,6 +3,7 @@ import { MdSend } from "react-icons/md";
 export const ExpenseForm = ({
   charge,
   cost,
+  edit,
   handleCost,
   handleCharge,
   handleSubmit,
@@ -36,7 +37,7 @@ export const ExpenseForm = ({
         </div>
       </div>
       <button type="submit" className="btn">
-        submit
+        {edit ? "edit" : "submit"}
         <MdSend className="btn-icon" />
       </button>
     </form>

@@ -12,7 +12,7 @@ const initialExpensec = [
   },
   {
     id: uuid(),
-    charge: "Ramdibazi",
+    charge: "Car",
     cost: 103,
   },
   {
@@ -33,6 +33,10 @@ function App() {
   const [cost, setCost] = useState("");
   //*****Alert ****/
   const [alert, setAlert] = useState({ show: false });
+  //******Edit *****/
+  const [edit, setEdit] = useState(false);
+  ///******ID ****/
+  const [id, setId] = useState(0);
   //****************FUNCTIONALITIES */
   const handleCharge = (e) => {
     setCharge(e.target.value);
@@ -53,10 +57,19 @@ function App() {
   };
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (charge != "" && cost > 0) {
-      const singleExpense = { id: uuid(), charge, cost };
-      setExpenses([...expenses, singleExpense]);
-      handleAlert({ type: "success", text: "item added" });
+    if (charge !== "" && cost > 0) {
+      if (edit) {
+        let tempExpenses = expenses.map((item) => {
+          return item.id === id ? { ...item, charge, cost } : item;
+        });
+        setExpenses(tempExpenses);
+        setEdit(false);
+        handleAlert({ type: "success", text: "Item got edited successfully" });
+      } else {
+        const singleExpense = { id: uuid(), charge, cost };
+        setExpenses([...expenses, singleExpense]);
+        handleAlert({ type: "success", text: "item added" });
+      }
       setCharge("");
       setCost("");
     } else {
@@ -67,6 +80,23 @@ function App() {
       });
     }
   };
+  const clearList = () => {
+    setExpenses([]);
+    console.log("Deleted list");
+  };
+  const handleDelete = (id) => {
+    const tempExpenses = expenses.filter((item) => item.id !== id);
+    setExpenses(tempExpenses);
+    handleAlert({ type: "danger", text: "Item Deleted successfully" });
+  };
+  const handleEdit = (id) => {
+    let expense = expenses.find((item) => item.id === id);
+    const { charge, cost } = expense;
+    setCharge(charge);
+    setCost(cost);
+    setEdit(true);
+    setId(id);
+  };
   return (
     <>
       {alert.show && <Alert type={alert.type} text={alert.text} />}
@@ -75,11 +105,17 @@ function App() {
         <ExpenseForm
           charge={charge}
           cost={cost}
+          edit={edit}
           handleCharge={handleCharge}
           handleCost={handleCost}
           handleSubmit={handleSubmit}
         />
-        <ExpenseList expenses={expenses} />
+        <ExpenseList
+          expenses={expenses}
+          clearList={clearList}
+          handleDelete={handleDelete}
+          handleEdit={handleEdit}
+        />
       </main>
       <h1>
         Total Spending:
